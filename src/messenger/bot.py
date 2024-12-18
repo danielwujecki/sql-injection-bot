@@ -87,7 +87,7 @@ async def setstatus(db: DBInterface, update: Update, context: ContextTypes.DEFAU
         return
 
     chatID = update.effective_chat.id
-    if not database.update.chat_status(db, chatID, " ".join(context.args)):
+    if not database.update.chat_status_bad(db, chatID, " ".join(context.args)):
         logger.error(f"Something went wrong while updating status for user with id '{chatID}'")
         await update.message.reply_text("Fehler: status konnte nicht gesetzt werden.")
         return

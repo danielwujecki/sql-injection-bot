@@ -16,6 +16,12 @@ def chat_status(db: DBInterface, chatID: int, status: str) -> bool:
     return bool(db.execute(sql_str, (status, chatID)) and db.commit())
 
 
+def chat_status_bad(db: DBInterface, chatID: int, status: str) -> bool:
+    sql_str = f"UPDATE chat SET status = '{status}' WHERE chatid = {chatID};"
+    logger.info(f"Update users status: {sql_str}")
+    return bool(db.execute(sql_str) and db.commit())
+
+
 def chat(db: DBInterface, chatID: int, firstname: str, lastname: str, username: str) -> bool:
     sql_str = """
         UPDATE chat SET firstname = %s, lastname = %s, username = %s
