@@ -46,10 +46,13 @@ async def start(db: DBInterface, update: Update, context: ContextTypes.DEFAULT_T
 async def me(db: DBInterface, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     utils.update_chat(db, update)
 
-    chatID = update.effective_chat.id
-    info   = database.get.chat_info(db, chatID)
+    info = database.get.chat_info(db, update.effective_chat.id)
+    if not info:
+        logger.warning(f"Unknown user: {update.effective_chat.id}")
+        await update.message.reply_text("Please issue /start command again!")
+        return
 
-    reply  = "Du besitzt nicht die nötigen Rechte um diesen Befehl auszuführen."
+    reply = "Du besitzt nicht die nötigen Rechte um diesen Befehl auszuführen."
     if info[2]:
         surname = f" {info[1]}" if info[1] else ""
         reply   = f"{info[0]}{surname}\nNutzergruppe {info[2]}: {info[3]}"
@@ -75,16 +78,21 @@ async def help_cmd(db: DBInterface, update: Update, _: ContextTypes.DEFAULT_TYPE
     utils.update_chat(db, update)
 
     chatID = update.effective_chat.id
-    groupID = database.get.chat_info(db, chatID)[2]
-    if not groupID:
-        groupID = 0
+    chat_info = database.get.chat_info(db, chatID)
+    if not chat_info:
+        logger.warning(f"Unknown user: {update.effective_chat.id}")
+        await update.message.reply_text("Please issue /start command again!")
+        return
+    if not chat_info[2]:
+        logger.error(f"No groupID for the following chat: {chat_info}")
+        return
 
     reply  = "Dieser Bot dient zur Demonstration von Sicherheitslücken.\n"
     reply += "/start - Nutzerupdate\n"
     reply += "/me - Informationen über mich\n"
     reply += "/groups - Gruppenübersicht\n"
     reply += "/help - Hilfe und Befehlsübersicht\n\n"
-    if groupID > 1:
+    if chat_info[2] > 1:
         reply += "/listusers - Nutzerliste\n"
         reply += "/setusergroup - Nutzergruppe setzen\n"
         reply += "/sendmsg - sende Nachricht an Nutzer"
@@ -112,8 +120,14 @@ async def listusers(db: DBInterface, update: Update, _: ContextTypes.DEFAULT_TYP
 async def setusergroup(db: DBInterface, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     utils.update_chat(db, update)
 
-    own_groupID = database.get.chat_info(db, update.effective_chat.id)[2]
-    if not own_groupID or own_groupID < 2:
+    chat_info = database.get.chat_info(db, update.effective_chat.id)
+    if not chat_info:
+        logger.warning(f"Unknown user: {update.effective_chat.id}")
+        await update.message.reply_text("Please issue /start command again!")
+        return
+
+    own_groupID = chat_info[2]
+    if own_groupID < 2:
         await update.message.reply_text("Du besitzt nicht die nötigen Rechte um diesen Befehl auszuführen.")
         return
 

@@ -1,4 +1,9 @@
+import logging
+
 from .dbinterface import DBInterface
+
+
+logger = logging.getLogger("sqlbot.database.get")
 
 
 def chat_known(db: DBInterface, chatID: int) -> bool:
@@ -15,9 +20,12 @@ def chat_info(db: DBInterface, chatID: int):
     """
     db.execute(sql_str, (chatID,))
     res = db.fetchall()
-    if res is None:
-        return res
-    return res[0]
+
+    logger.debug(f"chat_info(...): {res}")
+
+    if isinstance(res, list) and len(res) > 0:
+        return res[0]
+    return None
 
 
 def groups(db: DBInterface):
