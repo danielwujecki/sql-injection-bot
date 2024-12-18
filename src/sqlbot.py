@@ -34,10 +34,8 @@ def configure_db(cfg):
     db = database.dbinterface.DBInterface(cfg)
 
     if cfg.db_init:
-        database.tables.table_create_all(db, ric_csv=cfg.db_rics)
-        logmsg = "Please set 'db_init: false' in your config and restart."
-        print(logmsg)
-        logger.warning(logmsg)
+        database.tables.initialize_database(db)
+        logger.warning("Please set 'db_init: false' in your config and restart.")
         sys.exit(0)
 
     database.tables.check_table_existance(db)

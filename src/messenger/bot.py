@@ -55,7 +55,8 @@ async def me(db: DBInterface, update: Update, context: ContextTypes.DEFAULT_TYPE
     reply = "Du besitzt nicht die nötigen Rechte um diesen Befehl auszuführen."
     if info[2]:
         surname = f" {info[1]}" if info[1] else ""
-        reply   = f"{info[0]}{surname}\nNutzergruppe {info[2]}: {info[3]}"
+        status  = f"Status: '{info[4]}'" if info[4] else "Kein status gesetzt."
+        reply   = f"{info[0]}{surname}\nNutzergruppe {info[2]}: {info[3]}\n{status}"
 
     await update.message.reply_text(reply)
 
@@ -72,6 +73,26 @@ async def groups(db: DBInterface, update: Update, context: ContextTypes.DEFAULT_
         database.get.groups(db)
     ))
     await update.message.reply_text(reply)
+
+
+async def setstatus(db: DBInterface, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    utils.update_chat(db, update)
+
+    if not await utils.check_permissions(db, 1, update):
+        return
+
+    if len(context.args) < 1:
+        reply = "Korrekter Befehl:\n/setstatus <text>"
+        await update.message.reply_text(reply)
+        return
+
+    chatID = update.effective_chat.id
+    if not database.update.chat_status(db, chatID, " ".join(context.args)):
+        logger.error(f"Something went wrong while updating status for user with id '{chatID}'")
+        await update.message.reply_text("Fehler: status konnte nicht gesetzt werden.")
+        return
+
+    await update.message.reply_text("Status gesetzt.")
 
 
 async def help_cmd(db: DBInterface, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
@@ -91,6 +112,7 @@ async def help_cmd(db: DBInterface, update: Update, _: ContextTypes.DEFAULT_TYPE
     reply += "/start - Nutzerupdate\n"
     reply += "/me - Informationen über mich\n"
     reply += "/groups - Gruppenübersicht\n"
+    reply += "/setstatus - Status setzen\n"
     reply += "/help - Hilfe und Befehlsübersicht\n\n"
     if chat_info[2] > 1:
         reply += "/listusers - Nutzerliste\n"
@@ -235,9 +257,10 @@ async def error_handler(db: DBInterface, _: Update, context: ContextTypes.DEFAUL
 def configure_bot(cfg: Config, db: DBInterface) -> Application:
     application = ApplicationBuilder().token(cfg.telegram_token).build()
 
-    application.add_handler(CommandHandler("start",                         lambda U, c: start(db, U, c)))
+    application.add_handler(CommandHandler('start',                         lambda U, c: start(db, U, c)))
     application.add_handler(CommandHandler('me',                            lambda U, c: me(db, U, c)))
     application.add_handler(CommandHandler('groups',                        lambda U, c: groups(db, U, c)))
+    application.add_handler(CommandHandler('setstatus',                     lambda U, c: setstatus(db, U, c)))
     application.add_handler(CommandHandler('help',                          lambda U, c: help_cmd(db, U, c)))
 
     application.add_handler(CommandHandler('listusers',                     lambda U, c: listusers(db, U, c)))

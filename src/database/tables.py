@@ -36,11 +36,12 @@ def create_table_usergroup(db: DBInterface):
 def create_table_chat(db: DBInterface):
     sql_str = """
         CREATE TABLE chat (
-            chatID BIGINT PRIMARY KEY,
-            groupID SMALLINT NOT NULL,
+            chatID    BIGINT PRIMARY KEY,
+            groupID   SMALLINT NOT NULL,
             firstName TEXT NOT NULL,
-            lastName TEXT,
-            username TEXT,
+            lastName  TEXT,
+            username  TEXT,
+            status    TEXT,
             FOREIGN KEY (groupID) REFERENCES usergroup(groupID)
         );
     """

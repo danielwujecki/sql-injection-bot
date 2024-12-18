@@ -14,7 +14,7 @@ def chat_known(db: DBInterface, chatID: int) -> bool:
 
 def chat_info(db: DBInterface, chatID: int):
     sql_str = """
-        SELECT c.firstname, c.lastname, u.groupid, u.description
+        SELECT c.firstname, c.lastname, u.groupid, u.description, c.status
         FROM chat c INNER JOIN usergroup u on u.groupid = c.groupid
         WHERE chatid = %s;
     """

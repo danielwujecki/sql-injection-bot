@@ -1,6 +1,7 @@
 start - Nutzerupdate
 me - Informationen über mich
 groups - Gruppenübersicht
+setstatus - Status setzen
 help - Hilfe und Befehlsübersicht
 
 listusers - Nutzerliste
