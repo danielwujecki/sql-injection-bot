@@ -1,0 +1,8 @@
+start - Nutzerupdate
+me - Informationen über mich
+groups - Gruppenübersicht
+help - Hilfe und Befehlsübersicht
+
+listusers - Nutzerliste
+setusergroup - Nutzergruppe setzen
+sendmsg - sende Nachricht an Nutzer

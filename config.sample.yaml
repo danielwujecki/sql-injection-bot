@@ -1,0 +1,12 @@
+loglevel: info
+logfmt:   "[%(levelname)s] %(asctime)s - %(name)s: %(message)s"
+ascfmt:   "%d-%m-%y %H:%M:%S"
+
+db_init:     false
+db_user:     postgres
+db_name:     sql_bot
+db_password: <password>
+db_host:     sql-bot-postgres
+db_port:     5432
+
+telegram_token: "<telegram-token>"

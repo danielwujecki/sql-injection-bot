@@ -1,0 +1,30 @@
+name: sql-injection-bot
+
+services:
+  bot:
+    container_name: sql-bot-python
+    image: sql-bot:latest
+    build: ./
+    volumes:
+      - ./config.yaml:/usr/src/config.yaml:ro
+    networks:
+      - sql-bot-network
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: sql-bot-postgres
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=sql_bot
+      - POSTGRES_PASSWORD=kirORF7yT6K
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - sql-bot-network
+
+networks:
+  sql-bot-network:
+    name: sql-bot-network
